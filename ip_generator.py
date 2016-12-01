@@ -22,17 +22,29 @@ def ip_generator(total_num):
 def dataCenter_ip_generator(total_num, block_num):
     init = "10.10"
     ip_table = []
-    blocks = np.random.dirichlet(np.ones(block_num),size=1)
-    for i in range (block_num):
-        print i
-        block_id = "."+str(np.random.randint(0, 256))
-        for a in range(int(i*total_num)):
+    blocks = numpy.random.dirichlet(np.ones(block_num), size=1)
+    block_ids = []
+    for i in blocks[0]:
+        # print i
+        id = np.random.randint(0, 30)
+        while id in block_ids:
+            id = np.random.randint(0, 30)
+        block_ids.append(id)
+        block_id = "."+str(id)
+        a = 0
+        while a < int(i*total_num):
             ip_addres = init+block_id+"."+str(np.random.randint(0, 256))
-            print ip_addres
+            # print ip_addres
             if ip_addres not in ip_table:
                 ip_table.append(ip_addres)
+                a += 1
+        # for a in range(int(i*total_num)):
+        #     ip_addres = init+block_id+"."+str(np.random.randint(0, 256))
+        #     # print ip_addres
+        #     if ip_addres not in ip_table:
+        #         ip_table.append(ip_addres)
     return ip_table
 
 if __name__ == "__main__":
     # ip_generator(10)
-    dataCenter_ip_generator(10, 1)
+    dataCenter_ip_generator(10, 2)

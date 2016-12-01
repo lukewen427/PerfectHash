@@ -31,7 +31,7 @@ def sort_row(array):
 def shift_row(sorted_array, array):
     row = dict()
     block_array = np.zeros([10000], dtype=np.int)
-    print block_array
+    # print block_array
 
     # print sorted_array
     for single_row in sorted_array:
@@ -58,7 +58,7 @@ def shift_row(sorted_array, array):
                         # header = temp[0]
                         isExe = True
                         for col_id in temp:
-                            if block_array[count + col_id] > 0:
+                            if block_array[count + col_id] > 0 or block_array[count + col_id] == -1:
                                 isExe = False
                                 break
                         if isExe is True:
@@ -84,10 +84,12 @@ def simpe_perfect_hash():
         ab_key = (key-min_key)
         x = ab_key/t
         y = ab_key % t
-        array[x][y] = ab_key
+        if ab_key == 0:
+            array[x][y] = -1
+        else:
+            array[x][y] = ab_key
     sorted_array = sort_row(array)
     row = shift_row(sorted_array, array)
-    # print row
     for key in int_ip_table:
         ab_key = (key-min_key)
         x = ab_key/t
@@ -95,11 +97,12 @@ def simpe_perfect_hash():
         index = row[x]+y
         index_table.append(index)
         the_ip = int_to_ip(key)
-        # print the_ip, "->", key, "->", index
-    # print int_ip_table
+        print the_ip, "->", key, "->", index
+    print len(index_table), len(ip_table)
     print sorted(index_table)
 
 
 if __name__ == "__main__":
-    ip_table = ip_generator.ip_generator(100)
+    # ip_table = ip_generator.ip_generator(100)
+    ip_table = ip_generator.dataCenter_ip_generator(1000, 12)
     simpe_perfect_hash()
