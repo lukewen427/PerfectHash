@@ -1,4 +1,5 @@
-import numpy as np, numpy.random
+import numpy as np
+
 
 def ip_generator(total_num):
     init = "10.10.10"
@@ -22,7 +23,7 @@ def ip_generator(total_num):
 def dataCenter_ip_generator(total_num, block_num):
     init = "10.10"
     ip_table = []
-    blocks = numpy.random.dirichlet(np.ones(block_num), size=1)
+    blocks = np.random.dirichlet(np.ones(block_num), size=1)
     block_ids = []
     for i in blocks[0]:
         # print i
@@ -47,7 +48,7 @@ def dataCenter_ip_generator(total_num, block_num):
 
 
 def read_ip_table():
-    f = open('Ip.txt')
+    f = open('IPs.txt')
     ip_table = []
     for ip in iter(f):
         ip_table.append(ip.replace('\n', ''))
