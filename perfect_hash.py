@@ -69,7 +69,7 @@ def shift_row(sorted_array, array):
                         count += 1
                     else:
                         break
-    # print np.nonzero(block_array)
+    print np.nonzero(block_array)
     return row
 
 
@@ -98,11 +98,13 @@ def simpe_perfect_hash():
         index_table.append(index)
         the_ip = int_to_ip(key)
         print the_ip, "->", key, "->", index
-    print len(index_table), len(ip_table)
+    print len(ip_table)
+    print t
     print sorted(index_table)
 
 
 if __name__ == "__main__":
     # ip_table = ip_generator.ip_generator(100)
-    ip_table = ip_generator.dataCenter_ip_generator(1000, 12)
+    # ip_table = ip_generator.dataCenter_ip_generator(1000, 12)
+    ip_table = ip_generator.read_ip_table()
     simpe_perfect_hash()

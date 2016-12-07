@@ -26,9 +26,9 @@ def dataCenter_ip_generator(total_num, block_num):
     block_ids = []
     for i in blocks[0]:
         # print i
-        id = np.random.randint(0, 30)
+        id = np.random.randint(0, 256)
         while id in block_ids:
-            id = np.random.randint(0, 30)
+            id = np.random.randint(0, 256)
         block_ids.append(id)
         block_id = "."+str(id)
         a = 0
@@ -45,6 +45,15 @@ def dataCenter_ip_generator(total_num, block_num):
         #         ip_table.append(ip_addres)
     return ip_table
 
+
+def read_ip_table():
+    f = open('Ip.txt')
+    ip_table = []
+    for ip in iter(f):
+        ip_table.append(ip.replace('\n', ''))
+    return ip_table
+
 if __name__ == "__main__":
     # ip_generator(10)
-    dataCenter_ip_generator(10, 2)
+    # dataCenter_ip_generator(10, 2)
+    read_ip_table()
