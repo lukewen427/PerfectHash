@@ -23,8 +23,12 @@ def encode_IP(ip_table):
     return int_ips, ip_map
 
 
-def hash_one(key):
-    return key % gap
+def hash(key, d):
+    # print math.pow(key, d)
+    d = d ^ key * 16777619 & 0xffffffff
+    return d
+    # return math.pow(d, key)
+
 
 def CreateMinimalPerfectHash(dict):
     size = len(dict)
@@ -32,53 +36,60 @@ def CreateMinimalPerfectHash(dict):
     G = [0] * size
     values = [None] * size
     for key in dict.keys():
-        buckets[hash(dict[key]) % size].append(key)
+        buckets[dict[key] % size].append(key)
     buckets.sort(key=len, reverse=True)
-    # bucket = buckets[0]
-    # print hash_one(dict[bucket[0]])
-    # print dict[bucket[0]]
-    # print hash_one(dict[bucket[1]])
-    # print dict[bucket[1]]
-    # print gap
-    for b in xrange(1):
+    for b in xrange(size):
         bucket = buckets[b]
-        if len(bucket) <= 1:
-            break
-        d = 1
-        item = 0
-        slots = []
-        print hash_one(dict[bucket[0]])
-        print hash_one(dict[bucket[1]])
-        print size
-        print hash_one(dict[bucket[0]]) % size
-        print hash_one(dict[bucket[1]]) % size
-        # while item < len(bucket):
-        #     slot = hash_one(dict[bucket[item]]) % size
-        #     print slot
-        #     print slots, item
-        #     if values[slot] != None or slot in slots:
-        #         d += 1
-        #         item = 0
-        #         slots = []
-        #     else:
-        #         slots.append(slot)
-        #         item += 1
-        # print slots
-        # G[dict(bucket[0]) % size] = d
-        # for i in range(len(bucket)):
-        #     values[slots[i]] = dict[bucket[i]]
-        #
-        # if ( b % 1000 ) == 0:
-        #     print "bucket %d    r" % (b),
-        #     sys.stdout.flush()
+        if len(bucket) > 1:
+            item = 0
+            slots = []
+            # print "bucket: ", +b
+            d = 1
+            while(item < len(bucket)):
+                if dict[bucket[item]] == 0:
+                    slot = size-1
+                    slots.append(slot)
+                    item += 1
+                else:
+                    slot = int(hash(dict[bucket[item]], d) % size)
+                    if values[slot] != None or slot in slots:
+                        print "wrong hash"
+                        item = 0
+                        slots = []
+                        d += 1
+                    else:
+                        slots.append(slot)
+                        item += 1
+            # print slots
+            G[dict[bucket[0]] % size] = d
+            for i in range(len(bucket)):
+                values[slots[i]] = dict[bucket[i]]
+
+    # Process patterns with one key and use a negative value of d
+    freelist = []
+    for i in xrange(size):
+        if values[i] is None:
+            freelist.append(i)
+    for b in xrange(size):
+        bucket = buckets[b]
+        if len(bucket) == 1:
+            slot = freelist.pop()
+            G[dict[bucket[0]] % size] = -slot-1
+            values[slot] = dict[bucket[0]]
+    return values
+
 
 if __name__ == "__main__":
-    ip_table = ip_generator.ip_generator(100)
+    ip_table = ip_generator.read_ip_table()
+    # ip_table = ip_generator.ip_generator(100)
     int_ip_table, ip_map = encode_IP(ip_table)
     min_key = min(int_ip_table)
-    max_key = max(int_ip_table)
-    gap = max_key - min_key
     ip_opt = dict()
     for key, value in ip_map.iteritems():
         ip_opt[key] = value - min_key
-    CreateMinimalPerfectHash(ip_opt)
+    hash_table = CreateMinimalPerfectHash(ip_opt)
+    # print hash_table
+    for index in range(len(hash_table)):
+        hash_value = hash_table[index]
+        the_ip = int_to_ip(min_key+hash_value)
+        print the_ip, "->", hash_value, "->", index
