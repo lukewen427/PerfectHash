@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 
 def ip_generator(total_num):
@@ -46,6 +47,84 @@ def dataCenter_ip_generator(total_num, block_num):
         #         ip_table.append(ip_addres)
     return ip_table
 
+
+def read_formal_ip_table(prefix):
+    # https://www.ripe.net/about-us/press-centre/understanding-ip-addressing
+    ip_table = []
+    if prefix == 24:
+        init = "10.10.10"
+        for i in range(256):
+            ip_addres = init+"."+str(i)
+            ip_table.append(ip_addres)
+    if prefix == 22:
+        init = "10.10.252"
+        for i in range(105):
+            ip_addres = init+"."+str(i)
+            ip_table.append(ip_addres)
+        init = "10.10.253"
+        for i in range(51):
+            ip_addres = init+"."+str(i)
+            ip_table.append(ip_addres)
+        init = "10.10.254"
+        for i in range(50):
+            ip_addres = init+"."+str(i)
+            ip_table.append(ip_addres)
+        init = "10.10.255"
+        for i in range(50):
+            ip_addres = init+"."+str(i)
+            ip_table.append(ip_addres)
+    if prefix == 20:
+        init = "10.10.240"
+        for i in range(105):
+            ip_addres = init+"."+str(i)
+            ip_table.append(ip_addres)
+        init = "10.10.243"
+        for i in range(51):
+            ip_addres = init+"."+str(i)
+            ip_table.append(ip_addres)
+        init = "10.10.254"
+        for i in range(50):
+            ip_addres = init+"."+str(i)
+            ip_table.append(ip_addres)
+        init = "10.10.255"
+        for i in range(50):
+            ip_addres = init+"."+str(i)
+            ip_table.append(ip_addres)
+    if prefix == 18:
+        init = "10.10.192"
+        for i in range(105):
+            ip_addres = init+"."+str(i)
+            ip_table.append(ip_addres)
+        init = "10.10.200"
+        for i in range(51):
+            ip_addres = init+"."+str(i)
+            ip_table.append(ip_addres)
+        init = "10.10.210"
+        for i in range(50):
+            ip_addres = init+"."+str(i)
+            ip_table.append(ip_addres)
+        init = "10.10.245"
+        for i in range(50):
+            ip_addres = init+"."+str(i)
+            ip_table.append(ip_addres)
+    if prefix == 16:
+        init = "10.10.0"
+        for i in range(105):
+            ip_addres = init+"."+str(i)
+            ip_table.append(ip_addres)
+        init = "10.10.10"
+        for i in range(51):
+            ip_addres = init+"."+str(i)
+            ip_table.append(ip_addres)
+        init = "10.10.101"
+        for i in range(50):
+            ip_addres = init+"."+str(i)
+            ip_table.append(ip_addres)
+        init = "10.10.225"
+        for i in range(50):
+            ip_addres = init+"."+str(i)
+            ip_table.append(ip_addres)
+    return ip_table
 
 def read_ip_table():
     f = open('IPs.txt')
