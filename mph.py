@@ -28,7 +28,8 @@ def hash(key, d):
     if d == 0:
         # d = 0x811C9DC5
         return key
-    d = (key * d + d) % 16777619
+    d = (d ^ key * 0x01000193) % 1099511628211
+    # d = (key * d + d) % 16777619
     # d = d ^ (key) * 16777619 & 0xffffffff
     # if d == 0:
     #     d = 0x811C9DC5
@@ -45,6 +46,11 @@ def CreateMinimalPerfectHash(dict):
     for key in dict.keys():
         buckets[hash(dict[key], 0) % size].append(key)
     buckets.sort(key=len, reverse=True)
+    for h in xrange(size):
+        bucket = buckets[h]
+        if len(bucket) == 1:
+            break
+    print "confilit ", h
     for b in xrange(size):
         # print "bucket_num ", b
         bucket = buckets[b]
@@ -93,7 +99,8 @@ def CreateMinimalPerfectHash(dict):
 if __name__ == "__main__":
     # ip_table = ip_generator.read_ip_table()
     # ip_table = ip_generator.ip_generator(100)
-    ip_table = ip_generator.read_formal_ip_table(16)
+    ip_table = ip_generator.read_formal_ip_table(20)
+    # print len(ip_table)
     int_ip_table, ip_map = encode_IP(ip_table)
     min_key = min(int_ip_table)
     ip_opt = dict()
