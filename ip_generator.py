@@ -91,4 +91,4 @@ if __name__ == "__main__":
     # ip_generator(10)
     # dataCenter_ip_generator(10, 2)
     # read_ip_table()
-    read_formal_ip_table(20)
+    read_formal_ip_table(18)

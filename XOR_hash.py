@@ -1,8 +1,5 @@
 import ip_generator
-import math
-import numpy as np
-from scipy.sparse import csr_matrix
-import operator
+import mmh3
 
 def ip_to_int(s):
     # the rule can be found here: http://www.aboutmyip.com/AboutMyXApp/IP2Integer.jsp
@@ -12,6 +9,11 @@ def ip_to_int(s):
 def int_to_ip(num):
     return ".".join(map(lambda n: str(num >> n & 0xFF), [24, 16, 8, 0]))
 
+
+def uint_to_i32(u):
+    if (u > 0x7FFFFFFF):
+        u -= 0x100000000
+    return u
 
 def encode_IP(ip_table):
     ip_map = dict()
@@ -24,17 +26,19 @@ def encode_IP(ip_table):
 
 
 def hash(key, d):
-    FNV_prime = 1099511628211
-    offset_basis = 14695981039346656037
     # print math.pow(key, d)
     if d == 0:
         # d = 0x811C9DC5
-        return key
+        return mmh3.hash(str(key))
 
     # d = (key ^ d) * FNV_prime
     # d = (d ^ key * 0x01000193) % 1099511628211
     # d = (key * d + d) % 16777619
-    d = (d ^ (key) * FNV_prime) % offset_basis
+    d = d ^ key * 33
+    # d = (d << 4) ^ (d >> 28)
+    # d = d ^ key * 33
+    # d = d ^ key * 33
+    # d = (d ^ (key) * FNV_prime) % offset_basis
     # if d == 0:
     #     d = 0x811C9DC5
     # d = d ^ key * 2654435761
@@ -56,12 +60,13 @@ def uint32_t_hash(a, d):
     a = (a ^ 0xb55a4f09) ^ (a >> 16)
     return a ^ d
 
+
 def CreateMinimalPerfectHash(dict):
     size = len(dict)
     buckets = [[] for i in range(size)]
     values = [None] * size
     for key in dict.keys():
-        buckets[uint32_t_hash(dict[key], 0) % size].append(key)
+        buckets[hash(dict[key], 0) % size].append(key)
     buckets.sort(key=len, reverse=True)
     for h in xrange(size):
         bucket = buckets[h]
@@ -83,7 +88,7 @@ def CreateMinimalPerfectHash(dict):
             # print bucket
             d = 1
             while(item < len(bucket)):
-                slot = int(uint32_t_hash(dict[bucket[item]], d) % size)
+                slot = int(hash(dict[bucket[item]], d) % size)
                 if values[slot] != None or slot in slots:
                     # print "wrong hash"
                     item = 0
@@ -93,7 +98,7 @@ def CreateMinimalPerfectHash(dict):
                 else:
                     slots.append(slot)
                     item += 1
-            G[uint32_t_hash(dict[bucket[0]], 0) % size] = d
+            G[hash(dict[bucket[0]], 0) % size] = d
             for i in range(len(bucket)):
                 values[slots[i]] = dict[bucket[i]]
     # # Process patterns with one key and use a negative value of d
@@ -104,13 +109,13 @@ def CreateMinimalPerfectHash(dict):
     for b in xrange(b, size):
         bucket = buckets[b]
         if len(bucket) == 1:
-            ind = uint32_t_hash(dict[bucket[0]], 0) % size
+            ind = hash(dict[bucket[0]], 0) % size
             if values[ind] is None:
                 values[ind] = dict[bucket[0]]
                 freelist.remove(ind)
             else:
                 slot = freelist.pop()
-                G[uint32_t_hash(dict[bucket[0]], 0) % size] = -slot-1
+                G[hash(dict[bucket[0]], 0) % size] = -slot-1
                 values[slot] = dict[bucket[0]]
     return values
 
@@ -118,8 +123,9 @@ def CreateMinimalPerfectHash(dict):
 if __name__ == "__main__":
     # ip_table = ip_generator.read_ip_table()
     # ip_table = ip_generator.ip_generator(100)
-    ip_table = ip_generator.read_formal_ip_table(20)
+    ip_table = ip_generator.read_formal_ip_table(24)
     # print len(ip_table)
+    the_size = len(ip_table)
     int_ip_table, ip_map = encode_IP(ip_table)
     min_key = min(int_ip_table)
     ip_opt = dict()
@@ -128,8 +134,8 @@ if __name__ == "__main__":
         ip_opt[key] = value - min_key
     hash_table = CreateMinimalPerfectHash(ip_opt)
     print "offset_table", len(G)
-    # for index in range(len(hash_table)):
-    #     hash_value = hash_table[index]
-    #     the_ip = int_to_ip(min_key+hash_value)
-    #     print the_ip, "->", hash_value, "->", index
+    for index in range(len(hash_table)):
+        hash_value = hash_table[index]
+        the_ip = int_to_ip(min_key+hash_value)
+        print the_ip, "->", hash_value, "->", index
     # print "total_ip: ", len(ip_table)
